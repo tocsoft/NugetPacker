@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>NugetPacker</id>
+        <title>NugetPacker</title>
+        <version>$version$</version>
+        <authors>Tocsoft</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>An msbuild target for generating *.nupkg outputs on build.</description>
+        <projectUrl>https://github.com/tocsoft/NugetPacker</projectUrl>
+        <tags>MsBuild nuget pack</tags>
+        		<developmentDependency>true</developmentDependency>
+
+    </metadata>
+    <files>
+        <file src="NuGetPacker.targets" target="build" />
+        <file src="nuget.exe" target="tools" />
+    </files>
+</package>

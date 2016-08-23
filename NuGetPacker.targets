@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <NugetPackerVersion  Condition=" '$(NugetPackerVersion)' == '' "></NugetPackerVersion>
+        <NugetPackerOutputPath Condition=" '$(NugetPackerOutputPath)' == '' ">$(OutputPath)</NugetPackerOutputPath>
+        <NugetPackerRun Condition=" '$(NugetPackerRun)' == '' ">false</NugetPackerRun>
+    </PropertyGroup>
+
+	<PropertyGroup>
+		<BuildDependsOn>
+			$(BuildDependsOn);
+			NugetPacker;
+		</BuildDependsOn>
+	</PropertyGroup>
+
+
+	<Target Name="NugetPacker"  Condition="$(NugetPackerRun)">
+	
+		<PropertyGroup Condition=" '$(NugetPackerVersion)' == '' ">
+			<OutputAssembly>$(OutputPath)\$(AssemblyName).exe</OutputAssembly>
+			<OutputAssembly Condition="!Exists('$(OutputAssembly)')">$(OutputPath)\$(AssemblyName).dll</OutputAssembly>
+			
+			<NugetPackerVersion>%(assemblyVersion.Version)</NugetPackerVersion>
+		</PropertyGroup>
+		
+			<GetAssemblyIdentity AssemblyFiles=""  Condition=" '$(NugetPackerVersion)' == '' ">
+				<Output TaskParameter="Assemblies" ItemName="assemblyVersion"/>
+			</GetAssemblyIdentity>
+			
+		<PropertyGroup Condition=" '$(NugetPackerVersion)' == '' ">
+			<NugetPackerVersion>%(assemblyVersion.Version)</NugetPackerVersion>
+		</PropertyGroup>
+		
+		<Message Text="NugetPackerVersion = '$(NugetPackerVersion)'" Importance="High" />
+		<PropertyGroup>
+			
+
+		
+			<ToolsPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\tools\'))</ToolsPath>
+			<!-- Remove trailing backslash to not run into argument issues with .NET -->
+			<FullOutputPathWithoutTrailingBackslash>$([System.IO.Path]::GetFullPath('$(NugetPackerOutputPath)').TrimEnd('\'))</FullOutputPathWithoutTrailingBackslash>
+			<ProjectDirWithoutTrailingBackslash>$([System.IO.Path]::GetFullPath('$(ProjectDir)').TrimEnd('\'))</ProjectDirWithoutTrailingBackslash>
+			<NuGetPathWithoutTrailingBackslash>$([System.IO.Path]::GetFullPath('$(ToolsPath)').TrimEnd('\'))</NuGetPathWithoutTrailingBackslash>
+			<VersionCommand  Condition=" '$(NugetPackerVersion)' != '' ">-Version "$(NugetPackerVersion)"</VersionCommand>
+			
+
+
+			<NuGetCommand>$(ToolsPath)nuget.exe</NuGetCommand>
+			<BuildCommand>"$(NuGetCommand)" pack "$(MSBuildProjectFullPath)" -NonInteractive -BasePath "$(MSBuildProjectDirectory)" -o "$(FullOutputPathWithoutTrailingBackslash)" -Properties Configuration=$(Configuration) $(VersionCommand)</BuildCommand>
+		</PropertyGroup>
+		<MakeDir Directories="$(NugetPackerOutputPath)" />
+		<Message Text="$(BuildCommand)" Importance="High" />
+		<Exec Command="$(BuildCommand)" LogStandardErrorAsError="true" WorkingDirectory="$(ProjectDir)" />
+	</Target>
+	
+</Project>
